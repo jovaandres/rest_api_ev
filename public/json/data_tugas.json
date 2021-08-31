@@ -1,0 +1,34 @@
+{
+  "tugas": [
+    {
+      "jurusan": "IF",
+      "deadline": "Besok",
+      "title": "Tugas Membaca",
+      "description": "Baca Dua Buku"
+    },
+    {
+      "jurusan": "IF",
+      "deadline": "2 Minggu lagi",
+      "title": "Tugas Menulis",
+      "description": "Menulis Dua Buku"
+    },
+    {
+      "jurusan": "STI",
+      "deadline": "1 Minggu lagi",
+      "title": "Tugas Ngoding",
+      "description": "Buat Aplikasi"
+    },
+    {
+      "jurusan": "STI",
+      "deadline": "tes",
+      "title": "tes",
+      "description": "tes"
+    },
+    {
+      "jurusan": "STI",
+      "deadline": "tes",
+      "title": "tes",
+      "description": "tes"
+    }
+  ]
+}
