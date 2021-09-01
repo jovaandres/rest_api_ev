@@ -8,20 +8,20 @@ const getAllTugas = catchAsync(async(req, res) => {
 
 const getTugas = catchAsync(async(req, res) => {
     const _id = req.params.id
-    const newJson = jsonTugas.tugas.filter((obj) => obj.jurusan === _id)
+    const newJson = jsonTugas.filter((obj) => obj.category === _id)
     res.status(200).json(newJson)
 })
 
 const addTugas = catchAsync(async(req, res) => {
-    req.checkBody('jurusan', 'jurusan tidak ada.').notEmpty();
+    req.checkBody('category', 'jurusan tidak ada.').notEmpty();
     req.checkBody('deadline', 'deadline tidak ada.').notEmpty();
     req.checkBody('title', 'title pertanyaan tidak ada.').notEmpty();
     req.checkBody('description', 'description tidak ada.').notEmpty();
 
-    const {jurusan, deadline, title, description} = req.body;
+    const {category, deadline, title, description} = req.body;
 
-    jsonTugas.tugas.push({
-        "jurusan": jurusan,
+    jsonTugas.push({
+        "category": category,
         "deadline": deadline,
         "title": title,
         "description": description

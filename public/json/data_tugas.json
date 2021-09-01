@@ -1,30 +1,30 @@
 [
   {
-    "jurusan": "IF",
+    "category": "IF",
     "deadline": "Besok",
     "title": "Tugas Membaca",
     "description": "Baca Dua Buku"
   },
   {
-    "jurusan": "IF",
+    "category": "IF",
     "deadline": "2 Minggu lagi",
     "title": "Tugas Menulis",
     "description": "Menulis Dua Buku"
   },
   {
-    "jurusan": "STI",
+    "category": "STI",
     "deadline": "1 Minggu lagi",
     "title": "Tugas Ngoding",
     "description": "Buat Aplikasi"
   },
   {
-    "jurusan": "STI",
+    "category": "STI",
     "deadline": "tes",
     "title": "tes",
     "description": "tes"
   },
   {
-    "jurusan": "STI",
+    "category": "STI",
     "deadline": "tes",
     "title": "tes",
     "description": "tes"
