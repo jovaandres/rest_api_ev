@@ -1,5 +1,6 @@
 const catchAsync = require('../utils/catchAsync')
 const fs = require('fs');
+const pool = require('../utils/dbConnection');
 let jsonTugas = require('../public/json/data_tugas.json')
 
 const getAllTugas = catchAsync(async(req, res) => {
@@ -38,8 +39,22 @@ const addTugas = catchAsync(async(req, res) => {
     res.status(200).json(jsonTugas)
 })
 
+const getDB = catchAsync(async(req, res) => {
+    try {
+        const result = await pool.query("SELECT * FROM users");
+        const results = {'results': (result) ? result.rows : null};
+        res.status(200).json(results);
+    } catch (e) {
+        console.log(e);
+        res.status(500).json({
+            "message": "Internal server error"
+        })
+    }
+})
+
 module.exports = {
     getAllTugas,
     getTugas,
-    addTugas
+    addTugas,
+    getDB
 }
