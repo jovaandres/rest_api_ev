@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const tugas_controller = require('../controller/tugas_controller')
-const { auth, register, login, logout } = require('../controller/auth_controller');
+const { auth, register, login, logout, verifyEmail, reqEmailVerify, resetPassword, changePassword } = require('../controller/auth_controller');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -16,5 +16,9 @@ router.get('/db', tugas_controller.getDB)
 router.post('/register', register);
 router.post('/login', login);
 router.get('/logout', auth, logout);
+router.post('/verify/:email', reqEmailVerify);
+router.get('/verify/:email/:token', verifyEmail);
+router.post('/reset/:email', resetPassword);
+router.put('/reset', changePassword);
 
 module.exports = router;
