@@ -195,7 +195,7 @@ const resetPassword = catchAsync(async (req, res) => {
                     locals: {
                         name: row.rows[0].name,
                         email: email,
-                        link: `${process.env.ORIGIN_FRONTEND}/reset/${tokens.token}`
+                        link: `${process.env.ORIGIN_FRONTEND}/reset/${email}/${tokens.token}`
                     }
                 }).catch(console.error);
             }, "Email reset sent!");
