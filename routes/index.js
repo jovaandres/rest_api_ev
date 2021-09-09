@@ -1,11 +1,21 @@
 const express = require('express');
 const router = express.Router();
 const tugas_controller = require('../controller/tugas_controller')
-const { auth, register, login, logout, verifyEmail, reqEmailVerify, resetPassword, changePassword } = require('../controller/auth_controller');
+const {
+    auth,
+    register,
+    login,
+    logout,
+    verifyEmail,
+    reqEmailVerify,
+    resetPassword,
+    changePassword,
+    getAuth
+} = require('../controller/auth_controller');
 
 /* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+router.get('/', function (req, res, next) {
+    res.render('index', {title: 'Express'});
 });
 
 router.get('/tugas', tugas_controller.getAllTugas)
@@ -15,8 +25,9 @@ router.get('/db', tugas_controller.getDB)
 
 router.post('/register', register);
 router.post('/login', login);
-router.get('/logout', auth, logout);
+router.post('/logout', auth, logout);
 router.post('/verify', reqEmailVerify);
+router.post('/getauth', auth, getAuth);
 router.get('/verify/:email/:token', verifyEmail);
 router.post('/reset', resetPassword);
 router.put('/reset', changePassword);

@@ -11,29 +11,24 @@ const generateToken = catchAsync(async (user, cb) => {
         [token, user.id]).then(row => cb(row.rows[0]));
 });
 
-const findByToken = catchAsync(async (token, cb) => {
-    pool.query('SELECT * FROM tokens INNER JOIN users ON tokens.user_id=users.id WHERE token=$1', [token])
-        .then(row => cb(row.rows[0]));
-});
-
-const deleteToken = catchAsync(async (token, cb) => {
-    pool.query('DELETE FROM tokens WHERE token=$1', [token])
-        .then(cb(null));
-});
-
 let auth = catchAsync(async (req, res, next) => {
-    let token = req.cookies.auth;
-    await findByToken(token, (user) => {
-        if (!user) return res.json({
-            error: true
-        });
-
-        req.token = token;
-        req.user = user;
-
+    let user = req.session.user;
+    if (user) {
         next();
+    } else {
+        return res.status(401).json({
+            error: true,
+            message: "User not authenticated"
+        });
+    }
+});
+
+const getAuth = catchAsync(async (req, res) => {
+    return res.status(200).json({
+        user: req.session.user,
+        message: 'Successfully Logged In!'
     });
-})
+});
 
 const register = catchAsync(async (req, res) => {
     body('email', 'This field is required!').notEmpty();
@@ -45,7 +40,7 @@ const register = catchAsync(async (req, res) => {
         })
     }
 
-    const { name, username, email, password } = req.body;
+    const {name, username, email, password} = req.body;
 
     const row = await pool.query('SELECT email FROM users WHERE email=$1', [email]);
 
@@ -62,6 +57,7 @@ const register = catchAsync(async (req, res) => {
 
     if (rows.rowCount) {
         CreateVerificationEmail(rows.rows[0], res);
+        req.session.user = row.rows[0];
         return res.status(201).json({
             message: "Successfully registered!"
         });
@@ -79,45 +75,40 @@ const login = catchAsync(async (req, res) => {
         })
     }
 
-    const { email, password } = req.body;
+    const {email, password} = req.body;
 
-    let token = req.cookies.auth;
-    await findByToken(token, async (user) => {
-        if (user) return res.status(400).json({
-            error: true,
-            message: "You are already logged in!"
-        });
-        else {
-            const row = await pool.query("SELECT * FROM users WHERE email=$1", [email]);
+    let user = req.session.user;
+    if (user) return res.status(400).json({
+        error: true,
+        message: "You are already logged in!"
+    });
+    else {
+        const row = await pool.query("SELECT * FROM users WHERE email=$1", [email]);
 
-            if (row.rowCount === 0) {
-                return res.status(422).json({
-                    message: "Invalid email address!"
-                });
-            }
-
-            const passMatch = await bcrypt.compare(password, row.rows[0].password);
-            if (!passMatch) {
-                return res.status(422).json({
-                    message: "Incorrect password!",
-                });
-            }
-
-            generateToken(row.rows[0], (tokens) => {
-                res.cookie('auth', tokens.token).json({
-                    isAuth: true,
-                    id: row.rows[0].id,
-                    email: row.rows[0].email
-                });
+        if (row.rowCount === 0) {
+            return res.status(422).json({
+                message: "Invalid email address!"
             });
         }
-    });
+
+        const passMatch = await bcrypt.compare(password, row.rows[0].password);
+        if (!passMatch) {
+            return res.status(422).json({
+                message: "Incorrect password!",
+            });
+        } else {
+            req.session.user = row.rows[0];
+            res.status(200).json({
+                user: row.rows[0],
+                message: "Successfully Logged In!"
+            });
+        }
+    }
 });
 
 const logout = catchAsync(async (req, res) => {
-    deleteToken(req.token, (_) => {
-        res.sendStatus(200);
-    });
+    req.session.destroy();
+    res.sendStatus(200);
 });
 
 function CreateVerificationEmail(user, res) {
@@ -218,7 +209,7 @@ const changePassword = catchAsync(async (req, res) => {
     body("email", "Team email is required!").notEmpty();
     body("token", "Token is required!").notEmpty();
 
-    const { newPass, _, email, token } = req.body;
+    const {newPass, _, email, token} = req.body;
 
     let errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -245,6 +236,7 @@ module.exports = {
     login,
     logout,
     auth,
+    getAuth,
     reqEmailVerify,
     verifyEmail,
     resetPassword,
