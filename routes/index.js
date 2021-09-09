@@ -26,9 +26,9 @@ router.get('/db', tugas_controller.getDB)
 router.post('/register', register);
 router.post('/login', login);
 router.post('/logout', auth, logout);
-router.post('/verify', reqEmailVerify);
+router.post('/reqverify', reqEmailVerify);
 router.post('/getauth', auth, getAuth);
-router.get('/verify/:email/:token', verifyEmail);
+router.post('/verify', verifyEmail);
 router.post('/reset', resetPassword);
 router.put('/reset', changePassword);
 

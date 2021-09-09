@@ -57,7 +57,7 @@ const register = catchAsync(async (req, res) => {
 
     if (rows.rowCount) {
         CreateVerificationEmail(rows.rows[0], res);
-        req.session.user = row.rows[0];
+        req.session.user = rows.rows[0];
         return res.status(201).json({
             message: "Successfully registered!"
         });
@@ -124,7 +124,7 @@ function CreateVerificationEmail(user, res) {
             },
             locals: {
                 name: user.name,
-                link: `${process.env.ORIGIN_URL}/verify/${user.email}/${tokens.token}`
+                link: `${process.env.ORIGIN_FRONTEND}/verify/${tokens.token}`
             }
         }).catch(console.error);
     }, "Email verification sent!");
@@ -150,12 +150,15 @@ const reqEmailVerify = catchAsync(async (req, res) => {
 });
 
 const verifyEmail = catchAsync(async (req, res) => {
-    const email = req.params.email;
-    const token = req.params.token;
+    body('email', 'This field is required!').notEmpty();    
+    body('token', 'This field is required!').notEmpty();    
     let errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(400).json(errors);
     }
+
+    const email = req.body.email;
+    const token = req.body.token;
 
     const decode = jwt.verify(token, process.env.SECRET);
 
@@ -192,7 +195,7 @@ const resetPassword = catchAsync(async (req, res) => {
                     locals: {
                         name: row.rows[0].name,
                         email: email,
-                        link: `${process.env.ORIGIN_URL}/reset/${req.body.email}/${tokens.token}`
+                        link: `${process.env.ORIGIN_FRONTEND}/reset/${tokens.token}`
                     }
                 }).catch(console.error);
             }, "Email reset sent!");
