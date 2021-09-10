@@ -1,5 +1,5 @@
 const catchAsync = require('../utils/catchAsync');
-const {body, validationResult} = require('express-validator');
+const {check, validationResult} = require('express-validator');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const pool = require('../utils/dbConnection');
@@ -30,16 +30,54 @@ const getAuth = catchAsync(async (req, res) => {
     });
 });
 
-const register = catchAsync(async (req, res) => {
-    body('email', 'This field is required!').notEmpty();
-    body('password', 'Password is invalid (empty or length less than 8 characters).').notEmpty().isLength({min: 8});
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(422).json({
-            message: errors.array()
-        })
+const createValidationFor = (route) => {
+    switch (route) {
+        case 'register':
+            return [
+                check('name').notEmpty(),
+                check('username').notEmpty(),
+                check('email').isEmail().notEmpty(),
+                check('password').notEmpty().isLength({min: 8})
+            ];
+        case 'login':
+            return [
+                check('email').isEmail().notEmpty(),
+                check('password', ).notEmpty().isLength({min: 8})
+            ];
+        case 'reqverify':
+            return [
+                check('email').notEmpty()
+            ]
+        case 'verify':
+            return [
+                check('email').notEmpty(),
+                check('token').notEmpty()
+            ];
+        case 'reset':
+            return [
+                check('email').notEmpty()
+            ];
+        case 'change':
+            return [
+                check('newPass').notEmpty().isLength({min: 8}),
+                check('confirmPass').notEmpty(),
+                check("email").notEmpty(),
+                check("token").notEmpty()
+            ];
+        default:
+            return [];
     }
+}
 
+const checkValidationResult = (req, res, next) => {
+    const result = validationResult(req);
+    if (result.isEmpty()) next();
+    else res.status(422).json({
+        message: 'Invalid value'
+    });
+}
+
+const register = catchAsync(async (req, res) => {
     const {name, username, email, password} = req.body;
 
     const row = await pool.query('SELECT email FROM users WHERE email=$1', [email]);
@@ -65,16 +103,6 @@ const register = catchAsync(async (req, res) => {
 });
 
 const login = catchAsync(async (req, res) => {
-    body('email', 'This field is required!').notEmpty();
-    body('password', 'Password is invalid (empty or length less than 8 characters).').notEmpty().isLength({min: 8});
-    const errors = validationResult(req);
-
-    if (!errors.isEmpty()) {
-        return res.status(422).json({
-            message: errors.array()
-        })
-    }
-
     const {email, password} = req.body;
 
     let user = req.session.user;
@@ -131,12 +159,6 @@ function CreateVerificationEmail(user, res) {
 }
 
 const reqEmailVerify = catchAsync(async (req, res) => {
-    body('email', 'This field is required!').notEmpty();
-    let errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(400).json(errors);
-    }
-
     const email = req.body.email;
 
     pool.query('SELECT * FROM users WHERE email=$1', [email])
@@ -150,13 +172,6 @@ const reqEmailVerify = catchAsync(async (req, res) => {
 });
 
 const verifyEmail = catchAsync(async (req, res) => {
-    body('email', 'This field is required!').notEmpty();    
-    body('token', 'This field is required!').notEmpty();    
-    let errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(400).json(errors);
-    }
-
     const email = req.body.email;
     const token = req.body.token;
 
@@ -176,29 +191,29 @@ const verifyEmail = catchAsync(async (req, res) => {
 });
 
 const resetPassword = catchAsync(async (req, res) => {
-    body('email', 'This field is required!').notEmpty();
-    let errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(400).json(errors);
-    }
-
     const email = req.body.email
 
     pool.query('SELECT * FROM users WHERE email=$1', [email])
         .then(row => {
-            generateToken(row.rows[0], (tokens) => {
-                mailer.send({
-                    template: 'register',
-                    message: {
-                        to: email
-                    },
-                    locals: {
-                        name: row.rows[0].name,
-                        email: email,
-                        link: `${process.env.ORIGIN_FRONTEND}/reset/${email}/${tokens.token}`
-                    }
-                }).catch(console.error);
-            }, "Email reset sent!");
+            if (row.rowCount) {
+                generateToken(row.rows[0], (tokens) => {
+                    mailer.send({
+                        template: 'register',
+                        message: {
+                            to: email
+                        },
+                        locals: {
+                            name: row.rows[0].name,
+                            email: email,
+                            link: `${process.env.ORIGIN_FRONTEND}/reset/${email}/${tokens.token}`
+                        }
+                    });
+                }, "Email reset sent!");
+            } else {
+                res.status(404).json({
+                    message: "Email not found"
+                })
+            }
         });
 
     return res.status(200).json({
@@ -207,17 +222,7 @@ const resetPassword = catchAsync(async (req, res) => {
 });
 
 const changePassword = catchAsync(async (req, res) => {
-    body('newPass', 'Password is invalid (empty or length less than 8 characters).').notEmpty().isLength({min: 8});
-    body('confirmPass', 'Password confirmation is required.').notEmpty();
-    body("email", "Team email is required!").notEmpty();
-    body("token", "Token is required!").notEmpty();
-
     const {newPass, _, email, token} = req.body;
-
-    let errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(400).json(errors);
-    }
 
     const decode = jwt.verify(token, process.env.SECRET);
     if (decode.email === email) {
@@ -243,5 +248,7 @@ module.exports = {
     reqEmailVerify,
     verifyEmail,
     resetPassword,
-    changePassword
+    changePassword,
+    createValidationFor,
+    checkValidationResult
 }

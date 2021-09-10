@@ -10,7 +10,9 @@ const {
     reqEmailVerify,
     resetPassword,
     changePassword,
-    getAuth
+    getAuth,
+    createValidationFor,
+    checkValidationResult
 } = require('../controller/auth_controller');
 
 /* GET home page. */
@@ -23,13 +25,13 @@ router.get('/tugas/:id', tugas_controller.getTugas)
 router.post('/addtugas', tugas_controller.addTugas)
 router.get('/db', tugas_controller.getDB)
 
-router.post('/register', register);
-router.post('/login', login);
+router.post('/register', createValidationFor('register'), checkValidationResult, register);
+router.post('/login', createValidationFor('login'), checkValidationResult, login);
 router.post('/logout', auth, logout);
-router.post('/reqverify', reqEmailVerify);
+router.post('/reqverify', createValidationFor('reqverify'), checkValidationResult, reqEmailVerify);
 router.post('/getauth', auth, getAuth);
-router.post('/verify', verifyEmail);
-router.post('/reset', resetPassword);
-router.put('/reset', changePassword);
+router.post('/verify', createValidationFor('verify'), checkValidationResult, verifyEmail);
+router.post('/reset', createValidationFor('reset'), checkValidationResult, resetPassword);
+router.put('/reset', createValidationFor('change'), checkValidationResult, changePassword);
 
 module.exports = router;
