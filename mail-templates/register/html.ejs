@@ -1,16 +1,72 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Glory:wght@300;400&display=swap" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="x-apple-disable-message-reformatting">
+    <style>
+        .button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-align: center;
+            font-size: 24px;
+            font-family: "Nunito", sans-serif;
+            font-weight: 300;
+            margin: 1rem auto;
+            padding: 20px 0;
+            width: 200px;
+            height: 20px;
+            background: rgb(248, 77, 205);
+            border: 1px solid rgb(240, 69, 197);
+            color: #FFF;
+            overflow: hidden;
+            transition: all 0.5s;
+        }
+    </style>
 </head>
-<body>
-    <h1>Hallo <%= name %></h1>
-    <h2>Terimakasih sudah melakukan pendaftaran</h2>
-    <p>Untuk verifikasi tekan link berikut: </p>
-    <p><a href=<%= link %>>Verifikasi Email</a> </p>
-    <p>*Perhatian! Link ini hanya berlaku selama 30 menit.*</p>
+
+<body style="display: flex; align-items: center; justify-content: center; text-decoration: none;">
+    <div class="container" style="display: flex; align-items: center; justify-content: center; flex-direction: column; border: rgb(238, 90, 201) 1px solid;">
+        <div class="header" style="height: 1.5rem; width: 100%; background: rgb(238, 90, 201); margin-bottom: 2rem;"></div>
+        <div class="content">
+            <div class="title" style="display: flex; flex-direction: column; align-items: center; justify-content: space-evenly; font-family: 'Glory', sans-serif; font-size: 1.2rem;">
+                <i class='bx bx-analyse' style="font-size: 4rem; color: rgb(80, 5, 95);"></i>
+                <h2 style="margin: 0.5rem; color: rgb(58, 3, 70); letter-spacing: 4px;">Simplife</h2>
+            </div>
+            <div class="image" style="width: 12rem; height: 12rem; background-image: url('https://c.tenor.com/SetWbzAe4PAAAAAC/iu-blink.gif'); background-repeat: no-repeat; background-position: center; background-size: 150%; border-radius: 40%; margin: 1rem auto;"></div>
+            <div class="description" style="margin: 0.5rem; padding: 0.75rem 1rem; text-align: justify; font-family: 'Glory', sans-serif; font-size: 1.25rem;">
+                <p><b>Hi, <%= name %>!</b></p>
+                <p>We're happy you signed up. To start exploring our application services, please confirm your email.
+                    Otherwise, you can't continue using our services.</p>
+            </div>
+            <div class="button">
+                <a style="text-decoration: none" href=<%= link %>>
+                    <span style="color: #FFF;">CONFIRM</span>
+                </a>
+            </div>
+            <div class="description" style="margin: 0.5rem; padding: 0.75rem 1rem; text-align: justify; font-family: 'Glory', sans-serif; font-size: 1.25rem;">
+                <p>If you can't click the button, please click the link below to confirm your email.</p>
+                <a style="margin-bottom: 4rem;" href=<%= link %>><%= link %></a>
+            </div>
+            <div class="others" style="margin: 0 0.5rem; padding: 0.75rem 1rem; font-family: 'Glory', sans-serif; font-size: 1.25rem;">
+                <p>Regards,</p>
+                <p>Jova</p>
+            </div>
+        </div>
+        <div class="footer" style="height: 4.5rem; width: 100%; background: rgb(238, 90, 201); margin-top: 1rem;">
+            <h4 style="color: white; margin: 0.75rem; text-align: center; font-family: 'Glory', sans-serif; letter-spacing: 2px;">Simplife, Inc.</h4>
+            <h4 style="color: white; margin: 0.75rem; text-align: center; font-family: 'Glory', sans-serif; letter-spacing: 2px;">&copy; 2021</h4>
+        </div>
+    </div>
 </body>
+
 </html>
