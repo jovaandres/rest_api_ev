@@ -1,6 +1,6 @@
 const catchAsync = require('../utils/catchAsync')
 const fs = require('fs');
-const pool = require('../utils/dbConnection');
+const User = require('../models/users.models');
 let jsonTugas = require('../public/json/data_tugas.json')
 
 const getAllTugas = catchAsync(async(req, res) => {
@@ -41,8 +41,8 @@ const addTugas = catchAsync(async(req, res) => {
 
 const getDB = catchAsync(async(req, res) => {
     try {
-        const result = await pool.query("SELECT * FROM users");
-        const results = {'results': (result) ? result.rows : null};
+        const result = await User.find({});
+        const results = {'results': (result) ? result : null};
         res.status(200).json(results);
     } catch (e) {
         console.log(e);
