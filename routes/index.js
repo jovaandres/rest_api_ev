@@ -1,6 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const tugas_controller = require('../controller/tugas_controller')
+const {
+    getAllReminder,
+    addReminder
+} = require('../controller/tugas_controller')
+
 const {
     auth,
     register,
@@ -11,19 +15,15 @@ const {
     resetPassword,
     changePassword,
     getAuth,
-    createValidationFor,
-    checkValidationResult
 } = require('../controller/auth_controller');
 
-/* GET home page. */
-router.get('/', function (req, res, next) {
-    res.render('index', {title: 'Express'});
-});
+const {
+    createValidationFor,
+    checkValidationResult
+} = require('../utils/validationReq');
 
-router.get('/tugas', tugas_controller.getAllTugas)
-router.get('/tugas/:id', tugas_controller.getTugas)
-router.post('/addtugas', tugas_controller.addTugas)
-router.get('/db', tugas_controller.getDB)
+router.get('/reminder', getAllReminder);
+router.post('/reminder', createValidationFor('reminder'), checkValidationResult, addReminder);
 
 router.post('/register', createValidationFor('register'), checkValidationResult, register);
 router.post('/login', createValidationFor('login'), checkValidationResult, login);
