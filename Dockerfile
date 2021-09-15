@@ -1,10 +1,12 @@
 FROM node:15.4 as build
 
-WORKDIR /usr/src/app
+WORKDIR /api
 
-COPY package*.json ./
+COPY package*.json /api/
 
 RUN npm install
 
-EXPOSE 80
+COPY . /api/
+
+EXPOSE 4000
 CMD [ "node", "./bin/www"]
